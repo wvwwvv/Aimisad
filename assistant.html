@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#181818">
+<title>المساعد | نموذج أولي</title>
+<style>
+:root{--bg:#181818;--panel:#212121;--panel2:#2b2b2b;--line:#3a3a3a;--text:#f2f2f2;--mute:#a3a3a3;--ok:#8fd19e;--bad:#ff9a8f}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif;font-size:16px;line-height:1.75;display:flex;flex-direction:column}
+select,button,input,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:700;margin-inline-end:auto}
+.btn,select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn:hover,select:hover{border-color:#6a6a6a}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text);font-weight:700}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+#usage{font-size:12px;color:var(--mute)}
+main{flex:1;min-height:0;overflow-y:auto;padding:16px 14px}
+.wrap{max-width:780px;margin:0 auto}
+.msg{margin:0 0 18px}
+.msg.user .body{background:var(--panel2);border-radius:14px;padding:10px 14px;white-space:pre-wrap;display:inline-block;max-width:100%}
+.msg.bot .body p,.msg.bot .body ul,.msg.bot .body ol{margin:.4em 0}
+.msg.bot .body h2,.msg.bot .body h3,.msg.bot .body h4,.msg.bot .body h5{margin:.9em 0 .3em;line-height:1.4}
+.msg.bot .body h2{font-size:1.25em}.msg.bot .body h3{font-size:1.12em}.msg.bot .body h4,.msg.bot .body h5{font-size:1em}
+.body code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-family:ui-monospace,Consolas,monospace;font-size:.92em}
+.body pre{background:#111;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;direction:ltr;text-align:left}
+.body pre code{background:none;padding:0}
+.tw{overflow-x:auto;margin:.6em 0}
+table{border-collapse:collapse;min-width:60%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:start}
+th{background:var(--panel2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;color:var(--mute)}
+.chip button{background:none;border:0;cursor:pointer;color:var(--bad);padding:0 0 0 6px}
+.err{color:var(--bad);border:1px solid var(--bad);border-radius:10px;padding:8px 12px;margin:0 0 18px;font-size:15px}
+.props{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin-top:8px;font-size:14px}
+.props h6{margin:0 0 4px;font-size:13px;color:var(--mute);font-weight:600}
+.prop{display:flex;gap:8px;align-items:center;padding:4px 0}
+.prop span.t{flex:1}
+.prop.done{opacity:.55}
+.empty{text-align:center;color:var(--mute);margin-top:12vh}
+.empty h2{color:var(--text);margin:0 0 6px}
+footer{border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+.comp{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:none;max-height:180px;min-height:46px;outline:none}
+textarea:focus{border-color:#8a8a8a}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:18px;max-width:560px;width:calc(100% - 28px)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h3{margin:0 0 10px}
+dialog label{display:block;margin:10px 0 4px;font-size:14px;color:var(--mute)}
+dialog input[type=text],dialog input[type=password]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;direction:ltr;text-align:left}
+dialog .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+dialog .note{font-size:13px;color:var(--mute);margin:8px 0 0}
+dialog a{color:var(--text)}
+.mlist{list-style:none;margin:0;padding:0}
+.mlist li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.mlist li span{flex:1}
+.mlist button{background:none;border:0;color:var(--bad);cursor:pointer}
+.sec{margin-top:14px;font-weight:700;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>المساعد <span style="font-weight:400;color:var(--mute);font-size:13px">نموذج أولي</span></h1>
+  <select id="mode" aria-label="الوضع"></select>
+  <span id="usage" title="عدّاد تقريبي محلي لطلبات اليوم"></span>
+  <button class="btn" id="bMem">الذاكرة</button>
+  <button class="btn" id="bSet">الإعدادات</button>
+  <button class="btn" id="bNew">جديدة</button>
+</header>
+
+<main id="main"><div class="wrap" id="msgs"></div></main>
+
+<footer>
+  <div class="wrap">
+    <div class="chips" id="pend"></div>
+    <div class="comp">
+      <input type="file" id="file" accept="image/*,application/pdf" multiple hidden>
+      <button class="btn" id="bAtt" title="إرفاق صورة أو PDF" aria-label="إرفاق">إرفاق</button>
+      <textarea id="inp" rows="1" placeholder="اكتب رسالتك هنا..."></textarea>
+      <button class="btn primary" id="bSend">إرسال</button>
+    </div>
+  </div>
+</footer>
+
+<dialog id="dSet">
+  <h3>الإعدادات</h3>
+  <label for="key">مفتاح Gemini API (مجاني)</label>
+  <input type="password" id="key" autocomplete="off" placeholder="AIza...">
+  <p class="note">احصل عليه مجاناً من <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>. يُحفظ على هذا الجهاز فقط داخل المتصفح، ويُرسل إلى Google مباشرة عند كل طلب.</p>
+  <label for="model">اسم الموديل</label>
+  <input type="text" id="model" list="models" autocomplete="off">
+  <datalist id="models"><option value="gemini-2.5-flash"><option value="gemini-2.5-flash-lite"></datalist>
+  <p class="note">إذا ظهرت رسالة حد الطلبات، جرّب gemini-2.5-flash-lite. إذا ظهر أن الموديل غير موجود، اختر اسماً من قائمة الموديلات في AI Studio.</p>
+  <p class="note"><b>خصوصية:</b> قد تُستخدم طلبات الطبقة المجانية لتحسين منتجات Google. لا ترفع هويات أو بيانات مالية أو بيانات طلاب أو أي شيء حساس.</p>
+  <div class="row">
+    <button class="btn primary" id="saveSet">حفظ</button>
+    <button class="btn" id="closeSet">إغلاق</button>
+  </div>
+</dialog>
+
+<dialog id="dMem">
+  <h3>ما يعرفه المساعد عنك</h3>
+  <p class="note">لا يُحفظ شيء إلا بموافقتك. كل ما هنا مخزّن على هذا الجهاز فقط ويمكنك حذفه.</p>
+  <div class="sec">معلومات عنك</div>
+  <ul class="mlist" id="lFacts"></ul>
+  <div class="row"><input type="text" id="newFact" placeholder="أضف معلومة عنك..." style="direction:rtl;text-align:right;flex:1"><button class="btn" id="addFact">إضافة</button></div>
+  <div class="sec">أخطاؤك المتكررة</div>
+  <ul class="mlist" id="lMis"></ul>
+  <div class="row">
+    <button class="btn" id="bExp">تصدير</button>
+    <button class="btn" id="bImp">استيراد</button>
+    <input type="file" id="impFile" accept="application/json" hidden>
+    <button class="btn danger" id="bClr">مسح الكل</button>
+    <button class="btn" id="closeMem" style="margin-inline-start:auto">إغلاق</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+'use strict';
+var FENCE='`'.repeat(3);
+var $=function(s){return document.querySelector(s)};
+var store={
+  get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+var uid=function(){return Math.random().toString(36).slice(2,9)};
+
+/* ---------- prompts ---------- */
+var CORE='أنت "المساعد": مساعد شخصي ذكي يتحدث مع مستخدم عربي بفصحى مبسطة وواضحة، ولا بأس بكلمات من اللهجة الفلسطينية إذا استعملها المستخدم.\n'+
+'قواعدك:\n'+
+'1. كن صريحاً: قل للمستخدم أين أخطأ أو أين الضعف دون مجاملة، لكن بأدب وبشكل بنّاء.\n'+
+'2. اشرح خطوة بخطوة ولا تقفز إلى النتيجة.\n'+
+'3. إذا لم تكن متأكداً من قراءة نص أو من حل، قل ذلك صراحة ولا تخمّن.\n'+
+'4. لا تخترع معلومات أو مصادر. إذا كنت لا تعرف فقل: لا أعرف.\n'+
+'5. اكتب الرياضيات بنص عادي ورموز يونيكود (مثل: x² + 3x − 4 = 0، √، ÷، ×) ولا تستخدم LaTeX.\n'+
+'6. اجعل الرد مختصراً ما لم يطلب المستخدم التفصيل.\n'+
+'7. استخدم Markdown بسيطاً: عناوين، قوائم، جداول، **خط عريض**.';
+
+var MODES={
+ general:{label:'عام',hint:'اسأل أي شيء، أو أرفق ملفاً واطلب شرحه.',prompt:''},
+ corrector:{label:'مصحّح امتحانات',hint:'أرفق صورة أو PDF للامتحان، وأرفق إجاباتك أو اكتبها، وسأصحّحها وأشخّص أخطاءك.',prompt:
+'## وضع المصحّح\nالمستخدم سيرسل امتحاناً (نصاً أو صورة أو PDF) وقد يرسل معه إجاباته. نفّذ بالترتيب:\n'+
+'1. استخرج الأسئلة ورقّمها. ما لا يُقرأ بوضوح علّمه "غير واضح" ولا تخمّن.\n'+
+'2. احلّ كل سؤال حلاً مرجعياً مستقلاً أولاً، دون التأثر بإجابة المستخدم.\n'+
+'3. اقرأ إجابة المستخدم لكل سؤال. إن لم يرسل إجابات فاكتفِ بالحل، ثم اسأله إن كان يريد إرسال إجاباته لتصحيحها.\n'+
+'4. قارن وصنّف كل سؤال: صحيح، خاطئ، أو صحيح جزئياً.\n'+
+'5. لكل إجابة غير صحيحة حدّد نوع الخطأ: حسابي، مفهومي، قراءة السؤال، خطوة ناقصة، أو صياغة. واشرح باختصار ما الذي فعله المستخدم وما الصحيح ولماذا.\n'+
+'شكل الرد: ملخص (عدد الصحيح والخاطئ والجزئي مع درجة تقديرية)، ثم جدول (السؤال | الحكم | نوع الخطأ)، ثم شرح الأخطاء، ثم أهم نمطين يتكرران، ثم ثلاثة أسئلة تدريب مشابهة.\n'+
+'إذا لم تكن واثقاً من حلك لسؤال فاذكر ذلك بوضوح واطلب من المستخدم مراجعته.\n'+
+'بعد انتهاء التقرير سجّل الأخطاء الجديدة في كتلة الذاكرة (kind=mistake).'},
+ critic:{label:'ناقد (كود / تصميم / نص)',hint:'الصق كودك أو نصك، أو أرفق صورة تصميم، وسأنقده بصراحة.',prompt:
+'## وضع الناقد\nالمستخدم يعرض عملاً (كود، تصميم، نص، خطة). انقده بصراحة واحترام:\n'+
+'1. ما يعمل جيداً (نقطتان كحد أقصى، محددتان).\n'+
+'2. المشاكل مرتبة من الأهم إلى الأقل، وكل مشكلة بدليل من العمل نفسه (اقتبس أو أشر إلى الموضع).\n'+
+'3. لكل مشكلة تحسين ملموس قابل للتنفيذ، وليس نصيحة عامة.\n'+
+'4. إن كان كوداً: الأخطاء المحتملة والأمان والأداء وقابلية القراءة. إن كان تصميماً: التباين والتسلسل البصري والمسافات وقابلية القراءة. إن كان نصاً: الوضوح والتماسك واللغة.\n'+
+'لا تجامل ولا تبالغ في المديح. إذا كان العمل جيداً فقل ذلك باختصار.'},
+ solver:{label:'حلّال مسائل',hint:'اكتب مسألة أو أرفق صورتها وسأحلّها خطوة بخطوة.',prompt:
+'## وضع حلّال المسائل\nحلّ المسألة خطوة بخطوة: اكتب المعطيات، ثم المطلوب، ثم طريقة الحل ولماذا اخترتها، ثم الخطوات، ثم الجواب النهائي.\n'+
+'تحقّق من جوابك بطريقة ثانية أو بالتعويض قبل عرضه. اذكر أي افتراضات. إذا احتملت المسألة أكثر من تفسير فاذكرها واحلّ الأرجح ثم أشر إلى الباقي.\n'+
+'بعد الحل اسأل سؤالاً قصيراً يختبر فهم المستخدم.'}
+};
+
+var MEMORY_RULES='\n## الذاكرة\nعندما تكتشف معلومة ثابتة ومفيدة عن المستخدم (مستواه، تفضيلاته، مشاريعه) أو خطأً متكرراً منه يستحق التسجيل، أضف في نهاية ردك فقط كتلة بهذا الشكل بالضبط، وإلا فلا تضف شيئاً:\n'+
+FENCE+'memory\n[{"kind":"fact","text":"..."},{"kind":"mistake","subject":"المادة","topic":"الموضوع","type":"حسابي","note":"وصف قصير"}]\n'+FENCE+'\n'+
+'لا تسجّل أرقام هوية أو بيانات مالية أو كلمات مرور أو معلومات حساسة، ولا تسجّل شيئاً لم يقله المستخدم أو لم يظهر فعلاً في عمله.';
+
+/* ---------- state ---------- */
+var settings=Object.assign({key:'',model:'gemini-2.5-flash'},store.get('as_settings',{}));
+var memory=Object.assign({facts:[],mistakes:[]},store.get('as_memory',{}));
+if(!Array.isArray(memory.facts))memory.facts=[];
+if(!Array.isArray(memory.mistakes))memory.mistakes=[];
+var chat=store.get('as_chat',[]);
+if(!Array.isArray(chat))chat=[];
+var mode=store.get('as_mode','general');
+if(!MODES[mode])mode='general';
+var pending=[];
+var busy=false,ctrl=null,errMsg='';
+
+function saveSettings(){store.set('as_settings',settings)}
+function saveMemory(){store.set('as_memory',memory)}
+function saveChat(){
+  store.set('as_chat',chat.map(function(m){
+    return {role:m.role,text:m.text,files:(m.files||[]).map(function(f){return {name:f.name,mime:f.mime}}),proposals:m.proposals||[]};
+  }));
+}
+function today(){return new Date().toISOString().slice(0,10)}
+function usageGet(){var u=store.get('as_usage',{d:today(),n:0});return u.d===today()?u.n:0}
+function usageBump(){var n=usageGet()+1;store.set('as_usage',{d:today(),n:n});showUsage()}
+function showUsage(){$('#usage').textContent='طلبات اليوم: '+usageGet()}
+
+/* ---------- markdown (small, safe) ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function inl(s){
+  s=esc(s);
+  s=s.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/(^|[\s(،])\*([^*\n]+)\*(?=$|[\s).,!?:،؛])/g,'$1<em>$2</em>');
+  return s;
+}
+function cells(l){return l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(function(c){return c.trim()})}
+function md(src){
+  var L=String(src).replace(/\r/g,'').split('\n'),o=[],i=0;
+  var rowRe=/^\s*\|.*\|\s*$/;
+  var sepRe=/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+  var bulletRe=/^\s*[-*•]\s+/, numRe=/^\s*\d+[.)]\s+/;
+  function isTbl(k){return k+1<L.length&&rowRe.test(L[k])&&sepRe.test(L[k+1])}
+  function startsBlock(l){return /^```/.test(l)||/^#{1,4}\s/.test(l)||bulletRe.test(l)||numRe.test(l)||rowRe.test(l)}
+  while(i<L.length){
+    var l=L[i],m;
+    if(/^```/.test(l)){var b=[];i++;while(i<L.length&&!/^```/.test(L[i])){b.push(L[i]);i++}i++;o.push('<pre dir="ltr"><code>'+esc(b.join('\n'))+'</code></pre>');continue}
+    m=l.match(/^(#{1,4})\s+(.*)$/);
+    if(m){var n=m[1].length+1;o.push('<h'+n+'>'+inl(m[2])+'</h'+n+'>');i++;continue}
+    if(isTbl(i)){
+      var head=cells(L[i]);i+=2;var rows=[];
+      while(i<L.length&&rowRe.test(L[i])){rows.push(cells(L[i]));i++}
+      o.push('<div class="tw"><table><thead><tr>'+head.map(function(c){return '<th>'+inl(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
+        rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+inl(c)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>');
+      continue;
+    }
+    if(bulletRe.test(l)){var it=[];while(i<L.length&&bulletRe.test(L[i])){it.push(L[i].replace(bulletRe,''));i++}o.push('<ul>'+it.map(function(x){return '<li>'+inl(x)+'</li>'}).join('')+'</ul>');continue}
+    if(numRe.test(l)){var it2=[];while(i<L.length&&numRe.test(L[i])){it2.push(L[i].replace(numRe,''));i++}o.push('<ol>'+it2.map(function(x){return '<li>'+inl(x)+'</li>'}).join('')+'</ol>');continue}
+    if(!l.trim()){i++;continue}
+    var p=[l];i++;
+    while(i<L.length&&L[i].trim()&&!startsBlock(L[i])){p.push(L[i]);i++}
+    o.push('<p>'+p.map(inl).join('<br>')+'</p>');
+  }
+  return o.join('');
+}
+
+/* ---------- memory proposals ---------- */
+function splitMemory(raw){
+  var re=new RegExp(FENCE+'memory\\s*([\\s\\S]*?)'+FENCE,'i');
+  var mm=String(raw).match(re),props=[];
+  if(mm){
+    try{
+      var arr=JSON.parse(mm[1].trim());
+      if(Array.isArray(arr)){
+        props=arr.filter(function(x){
+          if(!x)return false;
+          var s=JSON.stringify(x);
+          if(/\d{9,}/.test(s))return false;
+          return (x.kind==='fact'&&typeof x.text==='string'&&x.text.trim())||(x.kind==='mistake'&&typeof x.note==='string'&&x.note.trim());
+        }).slice(0,8).map(function(x){return {
+          id:uid(),kind:x.kind,text:String(x.text||'').slice(0,300),subject:String(x.subject||'').slice(0,60),
+          topic:String(x.topic||'').slice(0,80),type:String(x.type||'').slice(0,40),note:String(x.note||'').slice(0,300),status:'new'}});
+      }
+    }catch(e){}
+  }
+  var text=String(raw).replace(new RegExp(FENCE+'memory[\\s\\S]*?(?:'+FENCE+'|$)','i'),'').trim();
+  return {text:text,props:props};
+}
+function acceptProp(p){
+  if(p.kind==='fact'){
+    var t=p.text.trim();
+    if(!memory.facts.some(function(f){return f.text===t}))memory.facts.push({id:uid(),text:t});
+  }else{
+    var ex=memory.mistakes.filter(function(x){return x.subject===p.subject&&x.topic===p.topic&&x.type===p.type})[0];
+    if(ex){ex.count=(ex.count||1)+1;ex.note=p.note;ex.last=Date.now()}
+    else memory.mistakes.push({id:uid(),subject:p.subject,topic:p.topic,type:p.type,note:p.note,count:1,last:Date.now()});
+  }
+  p.status='ok';saveMemory();saveChat();render();
+}
+function rejectProp(p){p.status='no';saveChat();render()}
+
+/* ---------- request building ---------- */
+function memoryText(){
+  var f=memory.facts.slice(-20).map(function(x){return '- '+x.text});
+  var m=memory.mistakes.slice().sort(function(a,b){return (b.count||1)-(a.count||1)}).slice(0,15).map(function(x){
+    return '- ['+(x.subject||'عام')+' / '+(x.topic||'-')+'] '+(x.type||'')+': '+x.note+' (تكرر '+(x.count||1)+' مرة)'});
+  var s='';
+  if(f.length)s+='\n\n## ما تعرفه عن المستخدم\n'+f.join('\n');
+  if(m.length)s+='\n\n## أخطاء المستخدم المتكررة\n'+m.join('\n')+'\nاستخدم هذه المعلومات فقط عندما تفيد الجواب الحالي، ولا تذكرها بلا داع.';
+  return s;
+}
+function systemText(){return CORE+'\n\n'+MODES[mode].prompt+'\n'+MEMORY_RULES+memoryText()}
+function toContents(){
+  var out=[];
+  chat.forEach(function(m){
+    var role=m.role==='user'?'user':'model',parts=[],t=m.text||'';
+    if(role==='user'){
+      var lost=(m.files||[]).filter(function(f){return !f.data}).map(function(f){return f.name});
+      if(lost.length)t+='\n(مرفقات سابقة لم تعد متاحة: '+lost.join('، ')+')';
+      if(t)parts.push({text:t});
+      (m.files||[]).filter(function(f){return f.data}).forEach(function(f){parts.push({inline_data:{mime_type:f.mime,data:f.data}})});
+    }else if(t){parts.push({text:t})}
+    if(!parts.length)return;
+    var last=out[out.length-1];
+    if(last&&last.role===role)last.parts=last.parts.concat(parts);else out.push({role:role,parts:parts});
+  });
+  return out;
+}
+
+/* ---------- Gemini streaming ---------- */
+function streamGemini(contents,system,onText,signal){
+  var url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(settings.model)+':streamGenerateContent?alt=sse&key='+encodeURIComponent(settings.key);
+  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},signal:signal,
+    body:JSON.stringify({systemInstruction:{parts:[{text:system}]},contents:contents,generationConfig:{temperature:0.4}})
+  }).then(function(res){
+    if(!res.ok){
+      return res.json().catch(function(){return {}}).then(function(j){
+        var e=new Error((j.error&&j.error.message)||('HTTP '+res.status));e.status=res.status;throw e;
+      });
+    }
+    var reader=res.body.getReader(),dec=new TextDecoder(),buf='',full='',blocked='';
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done){
+          if(!full&&blocked)throw new Error('حُجب الرد: '+blocked);
+          return full;
+        }
+        buf+=dec.decode(r.value,{stream:true});
+        var idx;
+        while((idx=buf.indexOf('\n'))>=0){
+          var line=buf.slice(0,idx).trim();buf=buf.slice(idx+1);
+          if(line.indexOf('data:')!==0)continue;
+          var payload=line.slice(5).trim();
+          if(!payload||payload==='[DONE]')continue;
+          var j;try{j=JSON.parse(payload)}catch(e){continue}
+          if(j.promptFeedback&&j.promptFeedback.blockReason)blocked=j.promptFeedback.blockReason;
+          var c=j.candidates&&j.candidates[0];
+          if(c&&c.content&&c.content.parts){c.content.parts.forEach(function(p){if(p.text){full+=p.text;onText(full)}})}
+          if(c&&c.finishReason&&c.finishReason!=='STOP'&&c.finishReason!=='MAX_TOKENS'&&!full)blocked=c.finishReason;
+        }
+        return pump();
+      });
+    }
+    return pump();
+  });
+}
+function errText(e){
+  if(e&&e.name==='AbortError')return 'أُوقف الرد.';
+  var s=e&&e.status,m=(e&&e.message)||'';
+  if(s===429)return 'وصلت إلى حد الطلبات المجانية (بالدقيقة أو باليوم). انتظر قليلاً ثم أعد المحاولة، أو جرّب موديلاً أخف مثل gemini-2.5-flash-lite من الإعدادات.';
+  if(s===400&&/api key/i.test(m))return 'مفتاح API غير صالح. افتح الإعدادات وتأكد منه.';
+  if(s===400)return 'رفض الخادم الطلب (400): '+m;
+  if(s===403)return 'المفتاح مرفوض أو غير مفعّل لهذه الخدمة (403).';
+  if(s===404)return 'اسم الموديل غير موجود. غيّره من الإعدادات.';
+  if(e instanceof TypeError)return 'تعذّر الاتصال بالإنترنت أو تم حجب الطلب.';
+  return 'خطأ: '+m;
+}
+
+/* ---------- rendering ---------- */
+var curBody=null;
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function chipsFor(files){
+  var d=el('div','chips');
+  files.forEach(function(f){d.appendChild(el('span','chip','📎 '+f.name))});
+  return d;
+}
+function propsEl(m){
+  var box=el('div','props');box.appendChild(el('h6',null,'اقتراحات للذاكرة: لا يُحفظ شيء إلا بموافقتك'));
+  m.proposals.forEach(function(p){
+    var row=el('div','prop'+(p.status!=='new'?' done':''));
+    var label=p.kind==='fact'?p.text:('خطأ ('+(p.subject||'عام')+(p.topic?' / '+p.topic:'')+'): '+p.note+(p.type?' ['+p.type+']':''));
+    row.appendChild(el('span','t',label));
+    if(p.status==='new'){
+      var a=el('button','btn','حفظ'),r=el('button','btn','تجاهل');
+      a.onclick=function(){acceptProp(p)};r.onclick=function(){rejectProp(p)};
+      row.appendChild(a);row.appendChild(r);
+    }else row.appendChild(el('span',null,p.status==='ok'?'تم الحفظ':'تم التجاهل'));
+    box.appendChild(row);
+  });
+  return box;
+}
+function msgEl(m,isLast){
+  var d=el('div','msg '+(m.role==='user'?'user':'bot'));
+  if(m.files&&m.files.length)d.appendChild(chipsFor(m.files));
+  var b=el('div','body');
+  if(m.role==='user')b.textContent=m.text;else b.innerHTML=md(splitMemory(m.text||'').text);
+  d.appendChild(b);
+  if(isLast&&m.role!=='user')curBody=b;
+  if(m.proposals&&m.proposals.length)d.appendChild(propsEl(m));
+  return d;
+}
+function render(){
+  var box=$('#msgs');box.innerHTML='';curBody=null;
+  if(!chat.length){
+    var e=el('div','empty');
+    e.appendChild(el('h2',null,'أهلاً، أنا المساعد'));
+    e.appendChild(el('p',null,MODES[mode].hint));
+    if(!settings.key)e.appendChild(el('p',null,'ابدأ بفتح الإعدادات وإضافة مفتاح Gemini المجاني.'));
+    box.appendChild(e);
+  }
+  chat.forEach(function(m,i){box.appendChild(msgEl(m,i===chat.length-1))});
+  if(errMsg)box.appendChild(el('div','err',errMsg));
+  var main=$('#main');main.scrollTop=main.scrollHeight;
+  $('#bSend').textContent=busy?'إيقاف':'إرسال';
+}
+function renderPending(){
+  var d=$('#pend');d.innerHTML='';
+  pending.forEach(function(f,i){
+    var c=el('span','chip','📎 '+f.name+' ');
+    var x=el('button',null,'✕');x.setAttribute('aria-label','إزالة');x.onclick=function(){pending.splice(i,1);renderPending()};
+    c.appendChild(x);d.appendChild(c);
+  });
+}
+
+/* ---------- files ---------- */
+function addFile(file){
+  if(!file)return;
+  if(!(/^image\//.test(file.type)||file.type==='application/pdf')){errMsg='نوع الملف غير مدعوم: '+file.name+' (المسموح: صور وPDF)';render();return}
+  if(file.size>10*1024*1024){errMsg='الملف أكبر من 10 ميغابايت: '+file.name;render();return}
+  if(pending.length>=6){errMsg='الحد الأقصى 6 مرفقات في الرسالة.';render();return}
+  var r=new FileReader();
+  r.onload=function(){
+    var s=String(r.result);
+    pending.push({name:file.name||'صورة',mime:file.type,data:s.slice(s.indexOf(',')+1)});
+    renderPending();
+  };
+  r.readAsDataURL(file);
+}
+
+/* ---------- send ---------- */
+function send(){
+  if(busy){if(ctrl)ctrl.abort();return}
+  var inp=$('#inp'),text=inp.value.trim();
+  if(!text&&!pending.length)return;
+  if(!settings.key){errMsg='';openSettings();return}
+  errMsg='';
+  chat.push({role:'user',text:text,files:pending});
+  pending=[];renderPending();inp.value='';autosize();
+  var bot={role:'model',text:'',files:[],proposals:[]};
+  chat.push(bot);busy=true;ctrl=new AbortController();render();
+  usageBump();
+  var contents=toContents();
+  streamGemini(contents,systemText(),function(full){
+    bot.text=full;
+    if(curBody){curBody.innerHTML=md(splitMemory(full).text);var main=$('#main');main.scrollTop=main.scrollHeight}
+  },ctrl.signal).then(function(full){
+    var sp=splitMemory(full);bot.text=sp.text;bot.proposals=sp.props;
+  }).catch(function(e){
+    if(bot.text){var sp=splitMemory(bot.text);bot.text=sp.text}
+    else chat.pop();
+    errMsg=errText(e);
+  }).then(function(){
+    busy=false;ctrl=null;saveChat();render();
+  });
+}
+function autosize(){var t=$('#inp');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,180)+'px'}
+
+/* ---------- dialogs ---------- */
+function openSettings(){$('#key').value=settings.key;$('#model').value=settings.model;$('#dSet').showModal()}
+function renderMemory(){
+  var lf=$('#lFacts');lf.innerHTML='';
+  if(!memory.facts.length)lf.appendChild(el('li',null,'لا شيء بعد.'));
+  memory.facts.forEach(function(f){
+    var li=el('li');li.appendChild(el('span',null,f.text));
+    var x=el('button',null,'حذف');x.onclick=function(){memory.facts=memory.facts.filter(function(y){return y.id!==f.id});saveMemory();renderMemory()};
+    li.appendChild(x);lf.appendChild(li);
+  });
+  var lm=$('#lMis');lm.innerHTML='';
+  if(!memory.mistakes.length)lm.appendChild(el('li',null,'لا شيء بعد.'));
+  memory.mistakes.slice().sort(function(a,b){return (b.count||1)-(a.count||1)}).forEach(function(mk){
+    var li=el('li');
+    li.appendChild(el('span',null,'['+(mk.subject||'عام')+(mk.topic?' / '+mk.topic:'')+'] '+(mk.type?mk.type+': ':'')+mk.note+' (×'+(mk.count||1)+')'));
+    var x=el('button',null,'حذف');x.onclick=function(){memory.mistakes=memory.mistakes.filter(function(y){return y.id!==mk.id});saveMemory();renderMemory()};
+    li.appendChild(x);lm.appendChild(li);
+  });
+}
+
+/* ---------- wire up ---------- */
+var sel=$('#mode');
+Object.keys(MODES).forEach(function(k){var o=el('option',null,MODES[k].label);o.value=k;sel.appendChild(o)});
+sel.value=mode;
+sel.onchange=function(){mode=sel.value;store.set('as_mode',mode);render()};
+$('#bSend').onclick=send;
+$('#bAtt').onclick=function(){$('#file').click()};
+$('#file').onchange=function(e){Array.prototype.forEach.call(e.target.files,addFile);e.target.value=''};
+$('#inp').addEventListener('input',autosize);
+$('#inp').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!window.matchMedia('(pointer:coarse)').matches){e.preventDefault();send()}
+});
+$('#inp').addEventListener('paste',function(e){
+  var items=(e.clipboardData&&e.clipboardData.items)||[];
+  Array.prototype.forEach.call(items,function(it){if(it.kind==='file'&&/^image\//.test(it.type)){addFile(it.getAsFile())}});
+});
+$('#bSet').onclick=openSettings;
+$('#closeSet').onclick=function(){$('#dSet').close()};
+$('#saveSet').onclick=function(){
+  settings.key=$('#key').value.trim();
+  settings.model=$('#model').value.trim()||'gemini-2.5-flash';
+  saveSettings();$('#dSet').close();errMsg='';render();
+};
+$('#bMem').onclick=function(){renderMemory();$('#dMem').showModal()};
+$('#closeMem').onclick=function(){$('#dMem').close()};
+$('#addFact').onclick=function(){
+  var v=$('#newFact').value.trim();if(!v)return;
+  memory.facts.push({id:uid(),text:v.slice(0,300)});$('#newFact').value='';saveMemory();renderMemory();
+};
+$('#bNew').onclick=function(){
+  if(busy&&ctrl)ctrl.abort();
+  if(chat.length&&!confirm('بدء محادثة جديدة؟ ستُمسح المحادثة الحالية (الذاكرة تبقى).'))return;
+  chat=[];pending=[];errMsg='';saveChat();renderPending();render();
+};
+$('#bExp').onclick=function(){
+  var blob=new Blob([JSON.stringify(memory,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='assistant-memory.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+};
+$('#bImp').onclick=function(){$('#impFile').click()};
+$('#impFile').onchange=function(e){
+  var f=e.target.files[0];e.target.value='';if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var j=JSON.parse(String(r.result));
+      if(Array.isArray(j.facts))j.facts.forEach(function(x){if(x&&typeof x.text==='string'&&!memory.facts.some(function(y){return y.text===x.text}))memory.facts.push({id:uid(),text:x.text.slice(0,300)})});
+      if(Array.isArray(j.mistakes))j.mistakes.forEach(function(x){if(x&&typeof x.note==='string')memory.mistakes.push({id:uid(),subject:String(x.subject||''),topic:String(x.topic||''),type:String(x.type||''),note:x.note.slice(0,300),count:Number(x.count)||1,last:Date.now()})});
+      saveMemory();renderMemory();
+    }catch(err){alert('ملف غير صالح.')}
+  };
+  r.readAsText(f);
+};
+$('#bClr').onclick=function(){
+  if(!confirm('مسح كل ما في الذاكرة؟ لا يمكن التراجع.'))return;
+  memory={facts:[],mistakes:[]};saveMemory();renderMemory();
+};
+
+window.__t={md:md,splitMemory:splitMemory,toContents:toContents,errText:errText};
+showUsage();render();
+})();
+</script>
+</body>
+</html>
