@@ -76,7 +76,7 @@ button{cursor:pointer}
 .icon-btn{width:40px;height:40px;border-radius:12px;border:0;background:none;display:grid;place-items:center;color:var(--fg-2);flex:none}
 .icon-btn:hover{background:var(--surface);color:var(--fg)}
 .only-m{display:none}
-.scroll{flex:1;min-height:0;overflow-y:auto;scroll-behavior:auto}
+.scroll{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth}
 .col{max-width:780px;margin:0 auto;padding:8px var(--gut) 24px var(--gutr)}
 
 /* ---------- الشاشة الافتتاحية ---------- */
@@ -146,6 +146,7 @@ button{cursor:pointer}
 .prop.done{opacity:.55}
 .sm{border:1px solid var(--line-2);background:transparent;border-radius:9px;padding:3px 12px;font-size:13px}
 .sm:hover{background:var(--surface-2)}
+.gen-img{max-width:100%;border-radius:12px;margin-top:10px;border:1px solid var(--line)}
 
 /* ---------- صندوق الكتابة ---------- */
 .composer{flex:none;padding:6px var(--gut) 10px var(--gutr)}
@@ -277,7 +278,7 @@ dialog p{margin:6px 0;font-size:14.5px;color:var(--fg-2)}
 <script>
 (function(){
 'use strict';
-/* عنوان الخادم الوسيط (Cloudflare Worker). غيّره بعد نشر الـ Worker. */
+/* عنوان الخادم الوسيط (Cloudflare Worker) */
 var API_URL='AQ.Ab8RN6Lu4oXEZ-hg01iCS0RL9AOFCoJhj6QmPpoQkeoZ0-9xCw';
 
 var FENCE='`'.repeat(3);
@@ -344,7 +345,7 @@ function saveConvs(){
 }
 function cur(){for(var i=0;i<convs.length;i++)if(convs[i].id===curId)return convs[i];return null}
 
-/* ---------- ماركداون صغير وآمن ---------- */
+/* ---------- ماركداون مع معالجة وتوليد الصور السريع ---------- */
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function inl(s){
   return String(s).split(/(`[^`\n]+`)/).map(function(part,i){
@@ -364,8 +365,9 @@ function md(src){
   var bulletRe=/^\s*[-*•]\s+/,numRe=/^\s*\d+[.)]\s+/,quoteRe=/^\s*>\s?/;
   function isTbl(k){return k+1<L.length&&rowRe.test(L[k])&&sepRe.test(L[k+1])}
   function startsBlock(l){return /^\s*```/.test(l)||/^#{1,4}\s/.test(l)||bulletRe.test(l)||numRe.test(l)||rowRe.test(l)||quoteRe.test(l)||/^\s*(-{3,}|\*{3,})\s*$/.test(l)}
-  while(i<L.length){
-    var l=L[i],m;
+  while(i<L.length){ ![alt](url) // Markdown alt="'+esc(imgMatch[1])+'" class="gen-img" if(imgMatch){ imgMatch="l.match(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/);" l="L[i],m;" loading="lazy" o.push('<img src="'+esc(imgMatch[2])+'" var السريع الصور العادية الـ توليد خلال دعم صيغة للصور من وعرض>');
+      i++;continue;
+    }
     m=l.match(/^\s*```\s*([\w+#.-]*)/);
     if(m){var lang=m[1]||'code',b=[];i++;while(i<L.length&&!/^\s*```/.test(L[i])){b.push(L[i]);i++}i++;
       o.push('<div class="code"><div class="code-h"><span>'+esc(lang)+'</span><button type="button" data-cc="1">نسخ</button></div><pre><code>'+esc(b.join('\n'))+'</code></pre></div>');continue}
@@ -374,8 +376,7 @@ function md(src){
     if(/^\s*(-{3,}|\*{3,})\s*$/.test(l)){o.push('<hr>');i++;continue}
     if(isTbl(i)){
       var head=cells(L[i]);i+=2;var rows=[];
-      while(i<L.length&&rowRe.test(L[i])){rows.push(cells(L[i]));i++}
-      o.push('<div class="tw"><table><thead><tr>'+head.map(function(c){return '<th>'+inl(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
+      while(i<L.length&&rowRe.test(L[i])){rows.push(cells(L[i]));i++} class="tw" o.push('<div><table><thead><tr>'+head.map(function(c){return '<th>'+inl(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
         rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+inl(c)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>');
       continue;
     }
@@ -384,8 +385,7 @@ function md(src){
     if(numRe.test(l)){var it2=[];while(i<L.length&&numRe.test(L[i])){it2.push(L[i].replace(numRe,''));i++}o.push('<ol>'+it2.map(function(x){return '<li>'+inl(x)+'</li>'}).join('')+'</ol>');continue}
     if(!l.trim()){i++;continue}
     var p=[l];i++;
-    while(i<L.length&&L[i].trim()&&!startsBlock(L[i])){p.push(L[i]);i++}
-    o.push('<p>'+p.map(inl).join('<br>')+'</p>');
+    while(i<L.length&&L[i].trim()&&!startsBlock(L[i])){p.push(L[i]);i++} o.push('<p>'+p.map(inl).join('<br>')+'</p>');
   }
   return o.join('');
 }
@@ -450,7 +450,7 @@ function toContents(msgs){
   return out;
 }
 
-/* ---------- الاتصال بالخادم (بث) ---------- */
+/* ---------- الاتصال السريع بالخادم (بث وتحديث فوري للردود) ---------- */
 function apiError(status,code,message){var e=new Error(message||('HTTP '+status));e.status=status;e.code=code||'';return e}
 function streamChat(payload,onText,signal){
   return fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:signal}).then(function(res){
