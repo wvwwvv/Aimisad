@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#181818">
 <title>المساعد</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 /* التصميم: عمود محادثة واحد هادئ، شريط جانبي للمحادثات، ألوان العلامة (أسود #181818 وأبيض #f2f2f2) بلا لون مميّز سوى الأخضر للإشارات. */
 :root{
@@ -15,7 +12,7 @@
   --fg:#f2f2f2; --fg-2:#cfcfcf; --mute:#8f8f8f; --accent:#f2f2f2; --on-accent:#181818;
   --good:#8fd19e; --bad:#ff9a8f; --ring:rgba(242,242,242,.35); --scrim:rgba(0,0,0,.55);
   --shadow:0 10px 40px rgba(0,0,0,.45);
-  --font:"IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+  --font:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,Tahoma,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
   --gut:max(16px,env(safe-area-inset-left,0px));
   --gutr:max(16px,env(safe-area-inset-right,0px));
@@ -94,7 +91,8 @@ button{cursor:pointer}
 /* ---------- الرسائل ---------- */
 .msg{display:flex;gap:12px;margin:0 0 26px;align-items:flex-start}
 .msg.user{justify-content:flex-start}
-.msg.user .bub{background:var(--surface-2);border-radius:20px;padding:10px 16px;max-width:min(88%,620px);white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{width:100%}
+.msg.user .bub{background:var(--surface-2);border-radius:20px;padding:10px 16px;max-width:min(88%,620px);min-width:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal}
 .msg.bot .av{width:28px;height:28px;margin-top:5px}
 .msg.bot .av i{width:8px;height:8px}
 .msg.bot .av.mark{border-radius:9px}
