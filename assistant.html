@@ -12,7 +12,7 @@
   --fg:#eceef3; --fg-2:#c3c8d2; --mute:#8a91a0; --accent:#eceef3; --on-accent:#0f1115;
   --good:#8fd19e; --bad:#ff9a8f; --ring:rgba(242,242,242,.35); --scrim:rgba(0,0,0,.55);
   --shadow:0 10px 40px rgba(0,0,0,.45);
-  --font:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,Tahoma,sans-serif;
+  --font:-apple-system,"SF Pro Text","SF Pro Display",BlinkMacSystemFont,system-ui,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
   --gut:max(16px,env(safe-area-inset-left,0px));
   --gutr:max(16px,env(safe-area-inset-right,0px));
@@ -92,7 +92,8 @@ button{cursor:pointer}
 .msg{display:flex;gap:12px;margin:0 0 26px;align-items:flex-start}
 .msg.user{justify-content:flex-start}
 .msg.user{width:100%}
-.msg.user .bub{background:var(--surface-2);border-radius:20px;padding:10px 16px;max-width:min(88%,620px);min-width:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal}
+.msg.user .uw{max-width:min(88%,620px);min-width:0}
+.msg.user .bub{background:var(--surface-2);border-radius:20px;padding:10px 16px;max-width:none;min-width:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal}
 .msg.bot .av{width:28px;height:28px;margin-top:5px}
 .msg.bot .av i{width:8px;height:8px}
 .msg.bot .av.mark{border-radius:9px}
@@ -262,6 +263,10 @@ dialog{border-radius:26px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
 dialog::backdrop{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .err{border-radius:16px;background:rgba(255,154,143,.06)}
 .fine{opacity:.8}
+
+/* إصلاح نهائي: الفقاعة بعرض النص، ولا تنكسر الكلمة */
+.msg.user .uw{width:fit-content;max-width:min(88%,620px)}
+.msg.user .bub{width:auto;min-width:0;max-width:100%;overflow-wrap:break-word;word-break:normal;hyphens:none}
 </style>
 </head>
 <body>
@@ -303,7 +308,7 @@ dialog::backdrop{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
           <button class="send" id="bSend" aria-label="إرسال" disabled></button>
         </div>
       </div>
-      <div class="fine">المساعد قد يخطئ. راجع المعلومات المهمة، ولا ترسل بيانات حساسة.</div>
+      <div class="fine">المساعد قد يخطئ. راجع المعلومات المهمة، ولا ترسل بيانات حساسة. (نسخة 5)</div>
     </div>
   </section>
 </div>
@@ -651,7 +656,7 @@ function srcEl(list){
 }
 function msgEl(m,isLast,streaming){
   if(m.role==='user'){
-    var d=el('div','msg user'),w=el('div');
+    var d=el('div','msg user'),w=el('div','uw');
     if(m.files&&m.files.length)w.appendChild(filesEl(m.files,false));
     if(m.text)w.appendChild(el('div','bub',m.text));
     d.appendChild(w);return d;
